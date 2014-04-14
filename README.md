@@ -1,14 +1,5 @@
-microput
-========
+# nanoput - a DMP component
 
-Capture arbitrary data stream via HTTP, store it, define queries and run via otter.
+Cleanse cookies, cookie sync with exchanges, various metric tracking (metadata-driven), user set management.
 
-# aa
-
-## bbb
-
-aaa
-----
-
-rrr
-====
+This is somewhat similar to [Snowplow|https://github.com/snowplow/snowplow].
