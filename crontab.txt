@@ -1,0 +1,9 @@
+*/7 * * * * /opt/enr/sh/logrotate_minute.sh 2>&1 >> /opt/enr/log/rot-min.log
+0 * * * *  /opt/enr/sh/logrotate_hourly.sh 2>&1 >> /opt/enr/log/rot-hour.log
+*/5 * * * * /opt/enr/sh/fetch_stat_bundle.sh 2>&1 >> /opt/enr/log/fetch.log
+# 5 * * * * /opt/enr/sh/upload.sh  2>&1 >> /opt/enr/log/upload.log
+@hourly /bin/gzip /opt/enr/log/*.*.enr.log.????????.??????????
+
+@daily /bin/rm /opt/enr/log/logrotate*gz
+@weekly /bin/rm /opt/enr/log/upload.log.*.gz /opt/enr/log/misc.log.*.gz 
+@reboot  wget -q -O - http://169.254.169.254/latest/meta-data/instance-id > /var/run/aws.instance.id

@@ -1,0 +1,1 @@
+-- Please use 'py/generate_exclude_vendors.py' script to generate contents for this file.

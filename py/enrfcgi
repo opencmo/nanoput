@@ -1,0 +1,97 @@
+#!/opt/enr/virtupy/bin/python
+#
+# enrfcgi - this script starts and stops enrfcgi
+#
+# chkconfig:   - 85 15 
+#
+
+import sys, time
+import traceback
+from daemon import Daemon
+
+from cgi import escape
+import sys
+import os
+from flup.server.fcgi import WSGIServer
+import threading
+from common import * 
+import hgapi
+
+repo = hgapi.Repo(ENR_HOME)
+
+def sr(s):
+	s('200 OK', [('Content-Type', 'text/plain')])
+
+def app(environ, start_response):
+	_s = start_response
+	try:
+		path = environ['PATH_INFO']
+		if not path.startswith('/manage/'):
+			start_response('404 NOT FOUND', [('Content-Type', 'text/html')])
+			return "Not found"
+		path = path.replace('/manage','')
+		if path == '/hg/rev':
+			rev =  repo.hg_rev()
+			rev = str(rev)
+			sr(_s)
+			return rev
+		elif path == '/hg/update':
+			retval = repo.hg_pull(update=True)
+			sr(_s)
+			return str(retval)
+		elif path == "/hg/reload":
+			rev = repo.hg_rev()
+			log("Reloading with %s" % rev)
+			(exit_code, stdout, stderr) = run_cmd(['service','nginx','reload'])
+			sr(_s)
+			return "Exit code: %s\n\nSTDOUT\n%s\n\nSTDERR\n%s" % (exit_code,stdout,stderr)
+		elif path == '/1':
+			log(environ)
+			sr(_s)
+			return "OK"
+		else:
+			sr(_s)
+			return "Blah"
+	except Exception, e:
+		start_response('500 INTERNAL SERVER ERROR', 
+					   [('Content-Type', 'text/plain')])
+		return traceback.format_exc()
+
+	# path = path.replace('/manage','')
+	#if path == '/hg/rev':
+	#	return repo.hg_rev()
+	#return 'Test'
+
+class WsgiDaemon(Daemon):
+    def __init__(self,bindAddress):
+        Daemon.__init__(self, pidfile='/var/run/enrfcgi.pid')
+        self.bindAddress = bindAddress
+ 
+    def run(self):
+		svr = WSGIServer(app, bindAddress=self.bindAddress)
+		svr.run()
+
+def main():
+	port = 8081
+	host = '127.0.0.1'
+	bindAddress = (host,port)
+	d = WsgiDaemon(bindAddress)
+	if len(sys.argv) == 2:
+		if 'start' == sys.argv[1]:
+			d.start()
+		elif 'stop' == sys.argv[1]:
+			d.stop()
+		elif 'restart' == sys.argv[1]:
+			d.restart()
+		elif 'status' == sys.argv[1]:
+			d.status()
+		else:
+			print "Unknown command: %s" % sys.argv[1]
+			sys.exit(2)
+		sys.exit(0)
+	else:
+		print "usage: %s start|stop|restart" % sys.argv[0]
+		sys.exit(2)
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,12 @@
+
+
+80 nginx 
+5000 hg 
+8000 Catalina admin (Jira/Confluence/etc)
+# 8001 Apache
+8060 fisheye 
+8080 jira
+8081 enrfcgi (Python CGI-based management)
+8090 confluence 
+9000 PHP FastCGI 
+

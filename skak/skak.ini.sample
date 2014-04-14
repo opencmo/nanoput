@@ -1,0 +1,15 @@
+pcode=ABCDEFG
+ptoken={ProductToken}AbcdEfG12341
+
+akey=BLAXA234252DADSA
+skey=Z/$adsf$DARAATAGFAGASDFA
+
+# Node HTTP server
+http_user=admin
+http_passwd=admin
+
+# MySQL
+mysql_host=db.example.com
+mysql_db=db
+mysql_user=root
+mysql_passwd=password
